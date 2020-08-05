@@ -1,8 +1,14 @@
-## Python cls、\_\_call\_\_、\_\_new\_\_、\_\_init\_\_、\_\_del\_\_、\_\_doc\_\_、\_\_str\_\_、
+# Python cls、\_\_call\_\_、\_\_new\_\_、\_\_init\_\_、\_\_del\_\_、\_\_doc\_\_、\_\_str\_\_、
 
-### self 和 cls
+刷各种Python书籍的时候，都会看到很多类里有各种 **\_\_xxx\_\_** 函数，这些函数，涉及到了很多知识点，故想做一个汇总。
 
-我们先看看 self，self 是类的一个实例对象：
+## 1. self 和 cls 关键字的区别
+
+### 1.1 self 关键字
+
+`self`是类的每一个实例对象本身，相当于 C++ 的 this 指针。
+
+> self 表示的就是实例对象本身，即类的对象在内存中的地址	——《编写高质量的代码：改善Python程序的91个建议》
 
 ```python
 class A:
@@ -18,13 +24,69 @@ a3 = A()
 print(a3 is a1)   # False   说明 a3 是一个新的实例对象
 ```
 
-再看 cls，讲 cls 之前，我们不得不知道 @classmethod
+理解了 self 关键字是什么，再看看类内的变量吧。我把它们分为**类的公有变量**、**实例的私有变量**、**局部变量**。
 
+> ***Python 没有真正的私有。***
 
+```python
+class A:
+    name = "class A"            # 类内，函数外定义的变量，都是类的公有变量，所有类内函数需要通过 cls 关键字访问类的公有变量，外部可直接 类名.公有变量名 访问类的公有变量
+    def __init__(self):
+        name = 'Local A'            # 局部变量
+        self.number = 123
+        self.name = "Private A"     # 实例的私有变量，每个类的实例拥有自己的私有变量，各个实例的私有变量互不影响。不过Python没有真正的私有，所以外部可以直接 实例名.私有变量名 访问
+        print(name)     # Local A
 
-### 类方法和静态方法
-
+a = A()
+print(a.name)       # Private A     同名的私有变量覆盖了 类的公有变量
+print(a.number)     # 123   没有真正的私有，外部可以直接访问实例的私有变量
+print(A.name)       # class A   访问的是 类的公有变量
+A.name = 'class AA'		# 外部直接修改
+print(A.name)       # class AA
+# print(A.number)   # 报错，因为 类名.变量 不能访问 实例的私有变量
+print(a.name)       # Private A     同名的私有变量覆盖了 类的公有变量
 ```
+
+想要了解更多变量的作用域，推荐文章：[[Python\] 变量名的四个作用域及 nonlocal 关键字](https://blog.csdn.net/Spade_/article/details/107702841)
+
+我们只知道了外部是怎么修改类的公有变量的，那么类内怎么修改类的公有变量呢？这就涉及到了 `cls` 关键字了。 
+
+### 1.2 cls 关键字
+
+想要知道 `cls`， 得先了解类方法 `@classmethod` 和静态方法 `@staticmethod` 。
+
+#### 1.2.1 staticmethod和classmethod
+
+Python中的静态方法（staticmethod）和类方法（classmethod）都依赖于装饰器（decorator）来实现。定义方法和调用方法如下：
+
+```python
+class A(object):
+    def func(self, *args, **kwargs): pass	# self 关键字
+    
+    @staticmethod
+    def func1(*args, **kwargs):	pass		# 不需要 self 和 cls 关键字
+    
+    @classmethod
+    def func2(cls, *args, **kwargs): pass	# 不能缺少 cls 关键字
+```
+
+静态方法和类方法都可以**通过类名.方法名（如A.f()）或者实例.方法名（A().f()）的形式来访问**。其中静态方法没有常规方法的特殊行为，如绑定、非绑定、隐式参数等规则，而类方法的调用使用类本身作为其隐含参数，但调用本身并不需要显示提供该参数。
+
+```python
+a = A()
+a.func()
+# A.func()	# 报错
+
+a.func1()	# 类名.方法名 访问 staticmethod
+A.func1()	# 实例.方法名 访问 staticmethod
+
+a.func2()	# 类名.方法名 访问 classmethod		
+A.func2()	# 实例.方法名 访问 classmethod		注意：cls 是作为隐含参数传入的
+```
+
+类方法 `@classmethod` 用来做什么呢？下面我们看一个例子：
+
+```python
 class Fruit(object):
     total = 0
     @classmethod
@@ -41,21 +103,28 @@ class Fruit(object):
 class Apple(Fruit): pass
 class Banana(Fruit): pass
 
+Fruit.print_total()		# 0		注意：此处是0，我们会发现后面Apple、Banana修改total不会影响此值
 a1 = Apple()
-a1.set_total(200)
-a2 = Apple()
-a2.set_total(300)
-a1.print_total()
-a2.print_total()
-Apple.print_total()     # 可以直接使用 类名.类方法() 调用
+a1.set_total(200)		# 调用类方法 <class '__main__.Apple'> 200
+a2 = Apple()			
+a2.set_total(300)		# 调用类方法 <class '__main__.Apple'> 300
+a1.print_total()		# 300
+a2.print_total()		# 300
+Apple.print_total()     # 300
 
 b1 = Banana()
-b1.set_total(400)
+b1.set_total(400)		# 调用类方法 <class '__main__.Banana'> 400
 b2 = Banana()
-b1.print_total()
-b2.print_total()
-Banana.print_total()
+b1.print_total()		# 400
+b2.print_total()		# 400
+Banana.print_total()	# 400
+
+Fruit.print_total()		# 0
+Fruit.set_total(100)	# 调用类方法 <class '__main__.Fruit'> 100
+Fruit.print_total()		# 100
 ```
+
+不管你建立多少个 Apple 或 Banana 的类实例对象，这些实例对象都是共用一个 `cls.total` （注意函数内变量前不加 `cls` 关键字的话，则是局部变量）。所以类内是怎么修改类的公有变量的呢？显而易见，通过 类方法 `@classmethod` 关键字 定义的函数来修改类的公有变量的。
 
 ### \_\_init\_\_
 
