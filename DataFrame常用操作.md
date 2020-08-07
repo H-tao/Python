@@ -98,4 +98,34 @@ def get_rows(sheet_name, project_name):
         return -1
 ```
 
-##### 
+##### 留下最新的一条数据（去重）
+
+```python
+# 根据 Date 列 降序排序，再根据 Module Point 列去重, subset 可以指定多列去重
+df = df.sort_values(by="Date", ascending=False)
+# Module 和 Point 列都相同的行会被删除，且保留的是相同的最后一条数据
+df = df.drop_duplicates(subset=["Module"，"Point"], keep="last")
+```
+
+##### 遍历 DataFrame 的行列
+
+```python
+# 遍历列，column_name 为列名
+for column_name, col_series in df.iteritems():
+    print(column_name)
+    print(col_series)
+    one, two = col_series[col_series.index == 1], col_series[col_series.index == 2]	# 访问数据
+    
+# 遍历行，index 为行的索引（索引不一定是 0 - n 的序号）
+for index, row_series in df.iterrows():
+    print(index)
+    print(row_series)
+    name, score = row_series["Name"], row_series["Score"]	# 访问数据
+```
+
+##### 筛选特定值的所有行
+
+```python
+df = df[df["Name"].isin(["XiaoMing","XiaoHong"])]
+```
+
