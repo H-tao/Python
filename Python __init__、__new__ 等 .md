@@ -1,6 +1,7 @@
 # Python cls、\_\_call\_\_、\_\_new\_\_、\_\_init\_\_、\_\_del\_\_、\_\_doc\_\_、\_\_str\_\_、
 
 刷各种Python书籍的时候，都会看到很多类里有各种 **\_\_xxx\_\_** 函数，这些函数，涉及到了很多知识点，故想做一个汇总。
+https://docs.python.org/3/reference/datamodel.html#object.__init__
 
 ## 1. self 和 cls 关键字的区别
 
