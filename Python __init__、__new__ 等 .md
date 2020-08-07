@@ -1,15 +1,15 @@
-# Python cls、\_\_call\_\_、\_\_new\_\_、\_\_init\_\_、\_\_del\_\_、\_\_doc\_\_、\_\_str\_\_、
+# Python self、cls、\_\_call\_\_、\_\_new\_\_、\_\_init\_\_、\_\_del\_\_、\_\_doc\_\_、\_\_str\_\_、
 
 刷各种Python书籍的时候，都会看到很多类里有各种 **\_\_xxx\_\_** 函数，这些函数，涉及到了很多知识点，故想做一个汇总。
 https://docs.python.org/3/reference/datamodel.html#object.__init__
 
-## 1. self 和 cls 关键字的区别
+## 1. self 和 cls 的区别
 
 ### 1.1 self 关键字
 
 `self`是类的每一个实例对象本身，相当于 C++ 的 this 指针。
 
-> self 表示的就是实例对象本身，即类的对象在内存中的地址	——《编写高质量的代码：改善Python程序的91个建议》
+> self 表示的就是实例对象本身，即类的对象在内存中的地址。	——《编写高质量的代码：改善Python程序的91个建议》
 
 ```python
 class A:
@@ -25,38 +25,61 @@ a3 = A()
 print(a3 is a1)   # False   说明 a3 是一个新的实例对象
 ```
 
-理解了 self 关键字是什么，再看看类内的变量吧。我把它们分为**类的公有变量**、**实例的私有变量**、**局部变量**。
+理解了 self 关键字是什么，再看看类内的变量吧，这对我们了解 `cls` 关键字有帮助。
+
+### 1.2 类的变量
+
+它们分为**类的公有变量、保护变量、私有变量**和**实例的公有变量、保护变量、私有变量**。
 
 > ***Python 没有真正的私有。***
 
+很多书上都是这么说的，**但是新版的 Python 已经不能在外部访问 `__xxx ` 私有变量了。**
+
 ```python
 class A:
-    name = "class A"            # 类内，函数外定义的变量，都是类的公有变量，所有类内函数需要通过 cls 关键字访问类的公有变量，外部可直接 类名.公有变量名 访问类的公有变量
+    class_public = "class public"           # 类的公有变量
+    _class_protected = "class protected"    # 类的保护变量
+    __class_private = "class private"       # 类的私有变量
+    name = "class A"
     def __init__(self):
         name = 'Local A'            # 局部变量
-        self.number = 123
-        self.name = "Private A"     # 实例的私有变量，每个类的实例拥有自己的私有变量，各个实例的私有变量互不影响。不过Python没有真正的私有，所以外部可以直接 实例名.私有变量名 访问
-        print(name)     # Local A
+        self.name = "self A"
+        self.instance_public = "instance public"        # 实例的公有变量
+        self._instance_protected = "instance protected" # 实例的保护变量
+        self.__instance_private = "instance private"    # 实例的私有变量
+        print(name)     # Local A	优先访问局部变量
 
 a = A()
-print(a.name)       # Private A     同名的私有变量覆盖了 类的公有变量
-print(a.number)     # 123   没有真正的私有，外部可以直接访问实例的私有变量
-print(A.name)       # class A   访问的是 类的公有变量
-A.name = 'class AA'		# 外部直接修改
-print(A.name)       # class AA
-# print(A.number)   # 报错，因为 类名.变量 不能访问 实例的私有变量
-print(a.name)       # Private A     同名的私有变量覆盖了 类的公有变量
+# 实例的私有变量，每个类的实例拥有自己的私有变量，各个实例的私有变量互不影响。
+print(a.name)                   # self A        同名的 实例私有变量 覆盖了 类的公有变量
+print(a.class_public)           # class public
+print(a._class_protected)       # class protected   （Pycharm 提示: Access to a protected member _instance_protected of a class）
+# print(a.__class_private)        # AttributeError: 'A' object has no attribute '__class_private'
+print(a.instance_public)        # instance public
+print(a._instance_protected)    # instance protected    （Pycharm 提示: Access to a protected member _instance_protected of a class）
+# print(a.__instance_private)     # AttributeError: 'A' object has no attribute '__instance_private'
+
+# 类内，函数外定义的变量，都是类的变量，所有类内函数需要通过 cls 关键字访问类的变量，外部可直接 类名.公有变量名 访问类的公有变量
+print(A.name)                   # class A
+print(A.class_public)           # class public
+print(A._class_protected)       # class protected  （Pycharm 提示: Access to a protected member _class_protected of a class）
+# print(A.__class_private)        # AttributeError: type object 'A' has no attribute '__class_private'
+
+A.name = "Changed class A"		# 修改公有变量
+print(A.name)
+A._class_protected = "Changed class protected"	# 修改保护变量
+print(A._class_protected)
 ```
 
 想要了解更多变量的作用域，推荐文章：[[Python\] 变量名的四个作用域及 nonlocal 关键字](https://blog.csdn.net/Spade_/article/details/107702841)
 
-我们只知道了外部是怎么修改类的公有变量的，那么类内怎么修改类的公有变量呢？这就涉及到了 `cls` 关键字了。 
+我们只知道了外部是怎么修改类的公有变量的，那么**类内怎么修改类的公有变量呢？**这就涉及到了 `cls` 关键字了。 
 
-### 1.2 cls 关键字
+### 1.3 cls 关键字
 
 想要知道 `cls`， 得先了解类方法 `@classmethod` 和静态方法 `@staticmethod` 。
 
-#### 1.2.1 staticmethod和classmethod
+#### 1.3.1 staticmethod和classmethod
 
 Python中的静态方法（staticmethod）和类方法（classmethod）都依赖于装饰器（decorator）来实现。定义方法和调用方法如下：
 
@@ -76,7 +99,7 @@ class A(object):
 ```python
 a = A()
 a.func()
-# A.func()	# 报错
+# A.func()	# 报错 不能访问实例的函数
 
 a.func1()	# 类名.方法名 访问 staticmethod
 A.func1()	# 实例.方法名 访问 staticmethod
@@ -125,9 +148,15 @@ Fruit.set_total(100)	# 调用类方法 <class '__main__.Fruit'> 100
 Fruit.print_total()		# 100
 ```
 
-不管你建立多少个 Apple 或 Banana 的类实例对象，这些实例对象都是共用一个 `cls.total` （注意函数内变量前不加 `cls` 关键字的话，则是局部变量）。所以类内是怎么修改类的公有变量的呢？显而易见，通过 类方法 `@classmethod` 关键字 定义的函数来修改类的公有变量的。
+不管你创建多少个 Apple 或 Banana 的类实例对象，这些实例对象都是共用一个 `cls.total` （注意函数内变量前不加 `cls` 关键字的话，则是局部变量）。所以类内是怎么修改类的公有变量的呢？显而易见，**通过 类方法 `@classmethod` 关键字 定义的函数来修改类的公有变量。**
 
-### \_\_init\_\_
+## 2.\_\_call\_\_、\_\_new\_\_、\_\_init\_\_ 
+
+不知道你面试的时候，有没有人问你这三个的区别呢？
+
+https://docs.python.org/3/reference/datamodel.html#object.__init__
+
+### 1. \_\_call\_\_
 
 
 
