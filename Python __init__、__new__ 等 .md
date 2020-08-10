@@ -273,7 +273,7 @@ while True:
 
 ## 4. \_\_str\_\_、\_\_repr\_\_
 
-我们使用**str()**、和**repr()**打印对象时，分别会调用**\_\_str\_\_()、\_\_repr\_\_()**两个函数。
+我们直接打印对象或者使用**str()**、和**repr()**打印对象时，分别会调用**\_\_str\_\_()、\_\_repr\_\_()**两个函数。
 
 ### 4.1 \_\_str\_\_
 
@@ -339,14 +339,49 @@ obj == eval(repr(obj))
 
 4）这两个方法分别调用内建的\_\_str\_\_()和\_\_repr\_\_()方法，一般来说在类中都应该定义\_\_repr_\_\_()方法，而__\_\_str\_\_()方法则为可选，当可读性比准确性更为重要的时候应该考虑定义\_\_str\_\_()方法。如果类中没有定义__\_\_str\_\___()方法，则默认会使用__\_\_repr\_\_()方法的结果来返回对象的字符串表示形式。用户实现\_\_repr\_\_()方法的时候最好保证其返回值可以用eval()方法使对象重新还原。
 
-<img src="C:\Users\haita\AppData\Roaming\Typora\typora-user-images\image-20200810005416771.png" alt="image-20200810005416771" style="zoom:67%;" />
+## 5. _\_class\_\_
 
+<https://luobuda.github.io/2015/01/16/python-class/> 
+
+<http://brionas.github.io/2014/09/15/python-type-class/> 
+
+```
+class A(object): pass
+
+a = A()
+print(a.__class__, type(a))	# <class '__main__.A'> <class '__main__.A'>
+print(A.__class__, type(A))	# <class 'type'> <class 'type'>
+```
 
 
 ```
+class A(object): pass
+
+a = A()
 print(a.__class__, type(a))
 print(A.__class__, type(A))
+
+class B(type): pass
+
+class C(metaclass=B): pass
+
+a, c = A(), C()
+print(B.__class__, type(B))
+print(object.__class__, type(object))
+print(c.__class__, type(c))
+print(C.__class__, type(C))
+print(dir(a))
+print(A.__dict__)
+print(isinstance(C, (type, object)))
+print(issubclass(B, type))
+print(isinstance(C, object))
+print(isinstance(B, object), issubclass(B, object))
+print(isinstance(A, type))
+print(isinstance(int, object))
+print(isinstance(object, type), issubclass(object, type))
 ```
+
+
 
 ```
 class A(object):
@@ -356,7 +391,7 @@ class A(object):
 
 
 class B(type):
-    def __call__(cls, *args, **kwargs):         # TODO 为什么此处是 cls ？？？
+    def __call__(cls, *args, **kwargs):         # TODO 此处是 cls
         print("B __call__")
 
 
@@ -369,30 +404,9 @@ print(A.__dir__)
 print(A.__module__)
 ```
 
-```
-class A: pass
+## 6. _\_doc\_\_
 
-a = A()
-print(A)
-print(a)
 
-class B:
-    def __str__(self):
-        # 当对象被销毁时，会自动调用这个方法
-        print('__str__ 方法被调用了')
-        return f"{self.__class__} __str__"
-
-b = B()
-print(B)
-print(b)
-
-# __str__ 会被继承
-class C(B): pass
-
-c = C()
-print(C)
-print(c)
-```
 
 ### \_\_dir\_\_
 
