@@ -40,4 +40,23 @@ print(new_xg, new_xg is xg)    # Student(name='XiaoGang', number=1010, score='C'
 d = xm._asdict()
 print(d)    # OrderedDict([('name', 'XiaoMing'), ('number', 1007), ('score', 'A')])
 ```
+所以说这玩意儿到底有什么用呢？
 
+具名元组在存储[`csv`](https://docs.python.org/3.8/library/csv.html#module-csv)或者[`sqlite3`](https://docs.python.org/3.8/library/sqlite3.html#module-sqlite3)返回数据的时候特别有用
+
+```
+EmployeeRecord = namedtuple('EmployeeRecord', 'name, age, title, department, paygrade')
+
+import csv
+for emp in map(EmployeeRecord._make, csv.reader(open("employees.csv", "rb"))):
+    print(emp.name, emp.title)
+
+import sqlite3
+conn = sqlite3.connect('/companydata')
+cursor = conn.cursor()
+cursor.execute('SELECT name, age, title, department, paygrade FROM employees')
+for emp in map(EmployeeRecord._make, cursor.fetchall()):
+    print(emp.name, emp.title)
+    
+https://www.cnblogs.com/linwenbin/p/11282492.html
+```
