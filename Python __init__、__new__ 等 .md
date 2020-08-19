@@ -406,11 +406,182 @@ print(A.__module__)
 
 ## 6. _\_doc\_\_
 
+`__doc__`属性用于生成对象的帮助文本。
 
+```python
+>>> def func(n):
+...     '''return n'''
+...     return n
+...
+>>> class A:
+...     """This is class A"""
+...     pass
+...
+>>> A.__doc__
+'This is class A'
+>>> func.__doc__
+'return n'
+```
 
-### \_\_dir\_\_
+控制台中的help()函数或IDE等工具需要显示特性的文档时，会从特性的`__doc__`属性中提取信息。
 
+```python
+>>> help(func)
+Help on function func in module __main__:
 
+func(n)
+    return n
+
+>>> help(A)
+Help on class A in module __main__:
+
+class A(builtins.object)
+ |  This is class A
+ |
+ |  Data descriptors defined here:
+ |
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+```
+
+## 7. \_\_dir\_\_
+
+把对象传给**dir()**函数时调用，列出属性。例如，**dir(obj)**触发 `类.__dir__(obj)` 方法。
+
+```python
+>>> class A: pass
+...
+>>> A.__dir__
+<method '__dir__' of 'object' objects>
+>>> dir(A)
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__n
+e__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']
+```
+
+## 8. \_\_dict\_\_
+
+每一个类都有一个`__dict__`属性，其中包含的是它的所有属性，又称为类属性。
+
+```python
+>>> class A:
+...     name = "Name of Class A"
+...     def func(self):
+...         print(A.__class__.name)
+...
+>>> A.__dict__
+mappingproxy({'__module__': '__main__', 'name': 'Name of Class A', 'func': <function A.func at 0x000001DE62B95048>, '__dict__': <attribute '__dict__' of 'A' objects>, '__weakref__': <attribute '__weakref__' of
+'A' objects>, '__doc__': None})
+```
+
+访问类的属性和方法：
+
+```python
+>>> A.name
+'Name of Class A'
+>>> A.__dict__['name']
+'Name of Class A'
+>>> A.func
+<function A.func at 0x000001DE62B95048>
+>>> A.__dict__['func']
+<function A.func at 0x000001DE62B95048>
+```
+
+查看类型：
+
+```python
+>>> type(A.__dict__['func'])
+<class 'function'>
+>>> type(A.func)
+<class 'function'>
+```
+
+新增一个属性：
+
+```python
+>>> A.new_attr = 1
+>>> A.__dict__['new_attr']
+1
+>>> a = A()
+>>> a.new_attr
+1
+```
+
+## 9. \_\_base\_\_、_\_bases\_\_
+
+`__base__` 得到的是首位父类，`__bases__` 得到的是所有的父类。所有类的基类，都是 `object`。
+
+```python
+>>> int.__base__
+<class 'object'>
+>>> int.__bases__
+(<class 'object'>,)
+>>> str.__base__
+<class 'object'>
+>>> str.__bases__
+(<class 'object'>,)
+>>> type.__base__		# type 的基类是 object
+<class 'object'>
+>>> object.__base__		# object 是所有类的基类，输出为空
+>>>						
+```
+
+自定义类与多继承：
+
+```python
+>>> class A: pass
+...
+>>> class B: pass
+...
+>>> class C(A, B): pass
+...
+>>> A.__base__
+<class 'object'>			# 自定义类的基类也是 object
+>>> C.__base__
+<class '__main__.A'>		# __base__ 只会输出首位父类
+>>> C.__bases__
+(<class '__main__.A'>, <class '__main__.B'>)	# __bases__ 输出所有父类
+>>> C.__base__.__base__		# 访问父类的父类
+<class 'object'>
+```
+
+## 10. _\_name\_\_
+
+类都有一个 `__name__`，得到的是类名。
+
+```python
+>>> class A: pass
+...
+>>> A.__name__
+'A'
+>>> int.__name__
+'int'
+>>> float.__name__
+'float'
+>>> object.__name__
+'object'
+>>> def func(): pass	# 函数也有__name__
+...
+>>> func.__name__
+'func'
+```
+
+实例对象没有`__name__`：
+
+```python
+>>> a = A()
+>>> a.__name__
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'A' object has no attribute '__name__'
+>>> b = "banana"
+>>> b.__name__
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'str' object has no attribute '__name__'
+```
 
 
 
@@ -421,8 +592,6 @@ print(A.__module__)
 
 
 
-
-### \_\_dict\_\_
 
 
 
