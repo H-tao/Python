@@ -57,31 +57,45 @@ class Driver:
     def element_click(element):
         try:
             element.click()
+            return True
         except Exception as e:  # 输出报错原因
             print(element.id, e)
+            return False
 
     def click_element(self, xpath):
         element = self.find_element_by_xpath(xpath)
         if element is not None:
             self.element_click(element)  # 点击元素
-
-    def click_element_until(self, xpath, timeout=10):
-        self.is_visible(xpath, timeout)  # 等待元素出现
-        try:
-            element = self.browser.find_element_by_xpath(xpath)  # 定位元素
-        except NoSuchElementException as e:
-            print(e)
+            return True
         else:
-            self.is_clickable(xpath, timeout)  # 等待元素可点击
-            self.element_click(element)  # 点击元素
+            return False
+
+    def click_element_until(self, xpath, timeout=2):
+        if not self.is_visible(xpath, timeout):  # 等待元素出现
+            return False
+        else:
+            return self.click_element(xpath)
 
     def send_keys(self, xpath, keys):
         self.is_visible(xpath)
         try:
             element = self.browser.find_element_by_xpath(xpath)
             element.send_keys(keys)
+            return True
         except NoSuchElementException as e:
             print(e)
+            return False
+
+    def send_new_keys(self, xpath, keys):
+        self.is_visible(xpath)
+        try:
+            element = self.browser.find_element_by_xpath(xpath)
+            element.clear()
+            element.send_keys(keys)
+            return True
+        except NoSuchElementException as e:
+            print(e)
+            return False
 
     def switch_to_main(self, close_current=True):
         driver_ = self.browser
@@ -123,5 +137,4 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     driver.maximize_window()
     driver.find_element_by_name("Submit")
-
 ```
