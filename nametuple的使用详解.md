@@ -77,10 +77,10 @@ def read_file(file):
 lines = read_file("student_info.csv")
 csv_reader = csv.reader(lines)
 header = next(csv_reader)[:4]
-# llt = namedtuple("llt", header)
-llt = namedtuple("Student", "Name Date English Math Chinese Money")
+# Student = namedtuple("Student", header)
+Student = namedtuple("Student", "Name Date English Math Chinese Money")
 for index, row in enumerate(csv_reader):
-    _ = llt._make(row[:4])
+    _ = Student._make(row[:4])
     print(row[:4])      # 输出前 4 列
     print(_.Name, _.Date, _.English, _.Math, _.Chinese, _.Chinese)
     if index == 5:      # 输出前 5 行
