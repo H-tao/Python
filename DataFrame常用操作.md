@@ -1,4 +1,9 @@
+##### Series用法
+
+https://blog.csdn.net/cymy001/article/details/78268721
+
 ##### 解决 Pandas 输出省略的问题
+
 ```python
 pd.set_option('display.max_columns', 1000)
 pd.set_option('display.width', 1000)
@@ -128,4 +133,22 @@ for index, row_series in df.iterrows():
 ```python
 df = df[df["Name"].isin(["XiaoMing","XiaoHong"])]
 ```
+
+##### 统计空值数
+
+```python
+# 计算data每一行有多少个缺失值的值，即按行统计缺失值
+rows_null = df.isnull().sum(axis=1) 
+
+# 下面则是按列统计缺失值
+col_null = df.isnull().sum(axis=0)
+
+#统计整个df的缺失值
+all_null = df.isnull().sum().sum()
+
+# 统计某一列的缺失值
+idx_null = df['列名'].isnull().sum(axis=0)
+```
+
+
 
