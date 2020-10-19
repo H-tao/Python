@@ -40,7 +40,7 @@ requests.get()
 
 ```python
 def get(url, stream=False)
-	headers = {'User-Agent': 'xxx', 'Cookie': 'xxx'}
+    headers = {'User-Agent': 'xxx', 'Cookie': 'xxx'}
     response = requests.get(url=url, headers=headers, stream=stream)
     return response
 ```
