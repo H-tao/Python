@@ -52,3 +52,41 @@ if __name__ == '__main__':
     c1.start()
     c2.start()
 ```
+输出：
+```
+Producer-1  2432159404616
+Producer-2  2432159404616
+Producer-3  2432159404616
+Consumer-1  2432159404616
+Consumer-2  2432159404616
+Producer-1 已经加入一个: 1
+Producer-2 已经加入一个: 2
+Consumer-1 已经取得一个: 10
+Producer-3 已经加入一个: 3
+Consumer-1 已经取得一个: 20
+Consumer-2 已经取得一个: 30
+Producer-1 已经加入一个: 1
+Producer-2 已经加入一个: 2
+Producer-1 已经加入一个: 1
+Consumer-1 已经取得一个: 10
+Consumer-2 已经取得一个: 20
+Producer-3 已经加入一个: 3
+Producer-2 已经加入一个: 2
+Producer-2 已经加入一个: 2
+Producer-1 已经加入一个: 1
+Consumer-2 已经取得一个: 10
+Producer-3 已经加入一个: 3
+Consumer-1 已经取得一个: 30
+Producer-3 已经加入一个: 3
+Consumer-2 已经取得一个: 20
+Producer-2 已经加入一个: 2
+Consumer-1 已经取得一个: 20
+Producer-3 已经加入一个: 3
+Consumer-2 已经取得一个: 10
+Producer-1 已经加入一个: 1
+Consumer-1 已经取得一个: 30
+Producer-3 已经加入一个: 3
+Consumer-2 已经取得一个: 30
+Producer-2 已经加入一个: 2
+...
+```
