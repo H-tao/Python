@@ -14,7 +14,7 @@ def func(nums, i, lock: Lock):
     print(f"Thread -{i} : ", id(nums))
     lock.release()                          # 释放锁
     for i in range(3):
-        lock.acquire()                      # 我们认为nums也是共享资源，需要请求锁
+        lock.acquire()                      # nums也是共享资源，需要请求锁
         nums.append(i)
         print(f"Thread -{i} : ", nums)
         lock.release()                      # 释放锁
@@ -24,9 +24,9 @@ if __name__ == '__main__':
     nums = []
     print("Main Thread :", id(nums))
     for i in range(3):
-        p = Thread(target=func, args=(nums, i, lock, ))
-        p.start()
-        p.join()
+        t = Thread(target=func, args=(nums, i, lock, ))
+        t.start()
+        t.join()
     print("Main Thread :", nums)
 ```
 
@@ -59,14 +59,14 @@ def func(nums, i, lock: Lock):
     print(f"Process -{i} : ", id(nums))
     lock.release()                          # 释放锁
     for i in range(3):
-        lock.acquire()                      # 我们认为nums也是共享资源，需要请求锁
+        lock.acquire()                      # nums也是共享资源，需要请求锁
         nums.append(i)
         print(f"Process -{i} : ", nums)
         lock.release()                      # 释放锁
 
 if __name__ == '__main__':
     lock = Lock()
-    nums = []
+    nums = []							# 一个普通的list变量
     print("Main Process :", id(nums))
     for i in range(3):
         p = Process(target=func, args=(nums, i, lock, ))
@@ -94,4 +94,52 @@ Process -2 :  [0, 1, 2]
 Main Process : []
 ```
 
-每个进程都具有独立的内存空间。我们使用创建子进程的时候，子进程Process替我们深度复制了传入的参数，生成了自己的进程空间。因此不同进程操作的`list` 并不是同一个`list`，而是各个子进程复制出来的`list`。
+每个进程都具有独立的内存空间。我们使用创建子进程的时候，子进程Process替我们深度复制了传入的参数，生成了自己的进程空间。因此不同进程操作的`list` 并不是同一个`list`，而是各个子进程复制出来的`list`。如何在多进程中共享数据呢？这我们就要使用Python的中的管理器了。
+
+## 管理器——不同进程中共享数据
+
+管理器提供了一种创建共享数据的方法，从而可以在不同进程中共享，甚至可以通过网络跨机器共享数据。管理器维护一个用于管理 *共享对象* 的服务。其他进程可以通过代理访问这些共享对象。 
+
+```python
+from multiprocessing import Process, Lock, Manager
+
+def func(nums, i, lock: Lock):
+    lock.acquire()                          # 打印控制台是共享资源，需要请求锁
+    print(f"Process -{i} : ", id(nums))
+    lock.release()                          # 释放锁
+    for i in range(3):
+        lock.acquire()                      # nums也是共享资源，需要请求锁
+        nums.append(i)
+        print(f"Process -{i} : ", nums)
+        lock.release()                      # 释放锁
+
+if __name__ == '__main__':
+    lock = Lock()
+    nums = Manager().list([])               # 多个进程需要使用manager来传递共享变量
+    print("Main Process :", id(nums))
+    for i in range(3):
+        p = Process(target=func, args=(nums, i, lock, ))
+        p.start()
+        p.join()
+    print("Main Process :", nums)
+```
+
+输出结果，即便各个进程打印出来`list`的id不同，但是仍然是同一数据，这就是管理器的作用：
+
+```
+Main Process : 2062458258184
+Process -0 :  2071413251848
+Process -0 :  [0]
+Process -1 :  [0, 1]
+Process -2 :  [0, 1, 2]
+Process -1 :  1719761100616
+Process -0 :  [0, 1, 2, 0]
+Process -1 :  [0, 1, 2, 0, 1]
+Process -2 :  [0, 1, 2, 0, 1, 2]
+Process -2 :  2796768190280
+Process -0 :  [0, 1, 2, 0, 1, 2, 0]
+Process -1 :  [0, 1, 2, 0, 1, 2, 0, 1]
+Process -2 :  [0, 1, 2, 0, 1, 2, 0, 1, 2]
+Main Process : [0, 1, 2, 0, 1, 2, 0, 1, 2]
+```
+
