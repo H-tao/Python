@@ -58,9 +58,9 @@ if __name__ == '__main__':
     for c in chain(p_list, c_list):
         c.join()
     print("End")
-    ```
-    输出结果:
-    ```
+```
+输出结果:
+```
     Producer-1 已经加入一个: 1 1
 Producer-3 已经加入一个: 3 2
 Producer-1 已经加入一个: 1 3
