@@ -61,7 +61,7 @@ if __name__ == '__main__':
 ```
 输出结果:
 ```
-    Producer-1 已经加入一个: 1 1
+Producer-1 已经加入一个: 1 1
 Producer-3 已经加入一个: 3 2
 Producer-1 已经加入一个: 1 3
 Consumer-1 已经取得一个: 10 1
@@ -87,6 +87,4 @@ Consumer-1 已经取得一个: 10 0
 Producer-2 已经加入一个: 2 4
 Producer-3 已经加入一个: 3 0
 End
-
-Process finished with exit code 0
 ```
