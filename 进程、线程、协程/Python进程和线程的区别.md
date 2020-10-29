@@ -8,12 +8,14 @@
 
 ```python
 from threading import Thread, Lock
+import time
 
 def func(nums, i, lock: Lock):
     lock.acquire()                          # 打印控制台是共享资源，需要请求锁
     print(f"Thread -{i} : ", id(nums))
     lock.release()                          # 释放锁
-    for i in range(3):
+    for x in range(3):
+        time.sleep(1)
         lock.acquire()                      # nums也是共享资源，需要请求锁
         nums.append(i)
         print(f"Thread -{i} : ", nums)
@@ -23,9 +25,12 @@ if __name__ == '__main__':
     lock = Lock()
     nums = []
     print("Main Thread :", id(nums))
+    t_list = []
     for i in range(3):
         t = Thread(target=func, args=(nums, i, lock, ))
+        t_list.append(t)
         t.start()
+    for t in t_list:
         t.join()
     print("Main Thread :", nums)
 ```
@@ -33,32 +38,34 @@ if __name__ == '__main__':
 输出的结果是我们想象中的结果，多个线程写入的是同一个`list`：
 
 ```
-Main Thread : 3039846224456
-Thread -0 :  3039846224456
+Main Thread : 2112122344008
+Thread -0 :  2112122344008
+Thread -1 :  2112122344008
+Thread -2 :  2112122344008
 Thread -0 :  [0]
 Thread -1 :  [0, 1]
 Thread -2 :  [0, 1, 2]
-Thread -1 :  3039846224456
-Thread -0 :  [0, 1, 2, 0]
-Thread -1 :  [0, 1, 2, 0, 1]
-Thread -2 :  [0, 1, 2, 0, 1, 2]
-Thread -2 :  3039846224456
-Thread -0 :  [0, 1, 2, 0, 1, 2, 0]
-Thread -1 :  [0, 1, 2, 0, 1, 2, 0, 1]
-Thread -2 :  [0, 1, 2, 0, 1, 2, 0, 1, 2]
-Main Thread : [0, 1, 2, 0, 1, 2, 0, 1, 2]
+Thread -1 :  [0, 1, 2, 1]
+Thread -0 :  [0, 1, 2, 1, 0]
+Thread -2 :  [0, 1, 2, 1, 0, 2]
+Thread -0 :  [0, 1, 2, 1, 0, 2, 0]
+Thread -1 :  [0, 1, 2, 1, 0, 2, 0, 1]
+Thread -2 :  [0, 1, 2, 1, 0, 2, 0, 1, 2]
+Main Thread : [0, 1, 2, 1, 0, 2, 0, 1, 2]
 ```
 
 那么我们换成多进程呢？代码稍微修改一下：
 
 ```python
 from multiprocessing import Process, Lock
+import time
 
 def func(nums, i, lock: Lock):
     lock.acquire()                          # 打印控制台是共享资源，需要请求锁
     print(f"Process -{i} : ", id(nums))
     lock.release()                          # 释放锁
-    for i in range(3):
+    for x in range(3):
+        time.sleep(1)
         lock.acquire()                      # nums也是共享资源，需要请求锁
         nums.append(i)
         print(f"Process -{i} : ", nums)
@@ -68,9 +75,12 @@ if __name__ == '__main__':
     lock = Lock()
     nums = []							# 一个普通的list变量
     print("Main Process :", id(nums))
+    p_list = []
     for i in range(3):
         p = Process(target=func, args=(nums, i, lock, ))
+        p_list.append(p)
         p.start()
+    for p in p_list:
         p.join()
     print("Main Process :", nums)
 ```
@@ -78,19 +88,19 @@ if __name__ == '__main__':
 结果输出，和多线程是不同的，和我们想象中的效果不一样啊：
 
 ```
-Main Process : 2074467994184
-Process -0 :  2278560477128
+Main Process : 2153732646280
+Process -0 :  2598231611336
+Process -1 :  2290033891400
+Process -2 :  2314883635464
 Process -0 :  [0]
-Process -1 :  [0, 1]
-Process -2 :  [0, 1, 2]
-Process -1 :  2077940821960
-Process -0 :  [0]
-Process -1 :  [0, 1]
-Process -2 :  [0, 1, 2]
-Process -2 :  2538612830152
-Process -0 :  [0]
-Process -1 :  [0, 1]
-Process -2 :  [0, 1, 2]
+Process -1 :  [1]
+Process -2 :  [2]
+Process -0 :  [0, 0]
+Process -1 :  [1, 1]
+Process -2 :  [2, 2]
+Process -0 :  [0, 0, 0]
+Process -1 :  [1, 1, 1]
+Process -2 :  [2, 2, 2]
 Main Process : []
 ```
 
@@ -102,12 +112,14 @@ Main Process : []
 
 ```python
 from multiprocessing import Process, Lock, Manager
+import time
 
 def func(nums, i, lock: Lock):
     lock.acquire()                          # 打印控制台是共享资源，需要请求锁
     print(f"Process -{i} : ", id(nums))
     lock.release()                          # 释放锁
-    for i in range(3):
+    for x in range(3):
+        time.sleep(1)
         lock.acquire()                      # nums也是共享资源，需要请求锁
         nums.append(i)
         print(f"Process -{i} : ", nums)
@@ -117,9 +129,12 @@ if __name__ == '__main__':
     lock = Lock()
     nums = Manager().list([])               # 多个进程需要使用manager来传递共享变量
     print("Main Process :", id(nums))
+    p_list = []
     for i in range(3):
         p = Process(target=func, args=(nums, i, lock, ))
+        p_list.append(p)
         p.start()
+    for p in p_list:
         p.join()
     print("Main Process :", nums)
 ```
@@ -127,19 +142,19 @@ if __name__ == '__main__':
 输出结果，即便各个进程打印出来`list`的id不同，但是仍然是同一数据，这就是管理器的作用：
 
 ```
-Main Process : 2062458258184
-Process -0 :  2071413251848
-Process -0 :  [0]
-Process -1 :  [0, 1]
-Process -2 :  [0, 1, 2]
-Process -1 :  1719761100616
-Process -0 :  [0, 1, 2, 0]
-Process -1 :  [0, 1, 2, 0, 1]
-Process -2 :  [0, 1, 2, 0, 1, 2]
-Process -2 :  2796768190280
-Process -0 :  [0, 1, 2, 0, 1, 2, 0]
-Process -1 :  [0, 1, 2, 0, 1, 2, 0, 1]
-Process -2 :  [0, 1, 2, 0, 1, 2, 0, 1, 2]
-Main Process : [0, 1, 2, 0, 1, 2, 0, 1, 2]
+Main Process : 2511697914568
+Process -2 :  2023818640072
+Process -1 :  1574718126600
+Process -0 :  2238624938312
+Process -2 :  [2]
+Process -1 :  [2, 1]
+Process -0 :  [2, 1, 0]
+Process -2 :  [2, 1, 0, 2]
+Process -1 :  [2, 1, 0, 2, 1]
+Process -0 :  [2, 1, 0, 2, 1, 0]
+Process -2 :  [2, 1, 0, 2, 1, 0, 2]
+Process -1 :  [2, 1, 0, 2, 1, 0, 2, 1]
+Process -0 :  [2, 1, 0, 2, 1, 0, 2, 1, 0]
+Main Process : [2, 1, 0, 2, 1, 0, 2, 1, 0]
 ```
 
