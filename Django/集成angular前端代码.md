@@ -32,3 +32,24 @@ angular项目编译之后，生成的dist文件夹目录结构如下：
   - apps.py
   - models.py
 ```
+## 3. 修改项目的settings配置
+为了直接使用angular编译出来的前端代码不做过多的修改，我们打开项目的settings.py文件，修改templates目录的配置，找到:
+```python
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # 'DIRS': [os.path.join(BASE_DIR, 'templates')]   
+        'DIRS': [os.path.join(BASE_DIR, 'static')]    # 将templates修改为static，这样Django就会去static目录下找模板(.html)文件了
+        ,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+```
