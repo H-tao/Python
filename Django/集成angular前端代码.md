@@ -1,5 +1,5 @@
-angular原生的项目需要跑在webstorm上。angular与Django前后端不分离时，需要将angular的代码集成待Django中，搜了搜，网上居然没有一篇相关的教程，就很离谱！！！
-趁着这次简单搞了一次，先写个简单的教程记录一下。
+angular原生的项目需要跑在webstorm上。angular与Django前后端不分离时，需要将angular的代码集成待Django中，搜了搜，网上居然没有一篇相关的教程，全是简单讲了讲angularJS和Django的，也不全面，这就很离谱！！！
+参考JAVA跟Angular前后端不分离的教程，趁着这次简单搞了一次Django集成Angular前端代码，写个简单的教程记录一下。
 
 ## 1. angular项目编译
 不懂编译angular的前端小白，请自行百度。
