@@ -53,3 +53,14 @@ TEMPLATES = [
     },
 ]
 ```
+除了这样，我们还要修改静态文件的配置：
+```python
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+```
+## 4. 修改index.html
+```html
+<base href="/static/">
+```
