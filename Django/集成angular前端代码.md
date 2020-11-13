@@ -1,5 +1,9 @@
-## 1. angular项目编译生成dist文件夹
-angular项目编译之后，生成的dist文件夹目录结构如下：
+angular原生的项目需要跑在webstorm上。angular与Django前后端不分离时，需要将angular的代码集成待Django中，搜了搜，网上居然没有一篇相关的教程，就很离谱！！！
+趁着这次简单搞了一次，先写个简单的教程记录一下。
+
+## 1. angular项目编译
+不懂编译angular的前端小白，请自行百度。
+angular项目编译之后，生成的dist文件夹目录结构大致如下：
 ```
 - dist
   - index.html
