@@ -1,5 +1,5 @@
 ## 题目
-有n个进程共享同一个list，每个进程pi(i~[1,n])每隔一段时间就向中添加数字i。当所有进程都添加完毕时，在主进程将list的内容输出。
+有n个进程共享同一个list，每个进程pi(i~[1,n])每隔一段时间就向中添加数字i。当所有进程都添加完毕时，在主进程将list的内容输出。⭐
 ```python
 from multiprocessing import Process, Lock, Manager
 import time
