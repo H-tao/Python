@@ -15,7 +15,8 @@ from django.views.static import serve
 from MyProject.settings import STATICFILES_DIRS
 
 urlpatterns = [
+    ...
     url(r'^(?P<path>.*)$', serve, {'document_root': STATICFILES_DIRS[0]}),
-    
+    ...
 ]
 ```
