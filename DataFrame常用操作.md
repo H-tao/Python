@@ -150,5 +150,10 @@ all_null = df.isnull().sum().sum()
 idx_null = df['列名'].isnull().sum(axis=0)
 ```
 
+##### 判断NaN
 
+```python
+if v is not pandas.np.nan:
+    print(True)
+```
 
