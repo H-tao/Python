@@ -1,5 +1,4 @@
 
-```python
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver.common.by import By
 import selenium.webdriver.support.expected_conditions as EC
@@ -9,6 +8,7 @@ from selenium import webdriver
 from Config.settings import EXECUTABLE_PATH
 import time
 
+EXECUTABLE_PATH = r'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
 
 class Driver:
     def __init__(self, show_windows=True):
@@ -85,7 +85,7 @@ class Driver:
         else:
             return False
 
-    def click_element_until(self, xpath, timeout=2):
+    def click_element_until(self, xpath, timeout=10):
         if not self.is_visible(xpath, timeout):  # 等待元素出现
             return False
         else:
@@ -192,7 +192,8 @@ class Driver:
         else:
             return element
 
-    def find_sub_element_by_xpath(self, element, xpath):
+    @staticmethod
+    def find_sub_element_by_xpath(element, xpath):
         try:
             sub_element = element.find_element_by_xpath(xpath)
         except NoSuchElementException as e:
@@ -203,6 +204,11 @@ class Driver:
 
     # def status_code(self):
     #     self.browser.__get()
+
+    def set_element_value(self, xpath, value):
+        """ Xpath中使用双引号，则拼接js时要使用单引号包裹双引号 """
+        js = f'var ele = document.evaluate(\'{xpath}\', document).iterateNext(); ele.value = arguments[0];'
+        self.browser.execute_script(js, value)
         
     def open_url_in_new_window(self, url, close_current=False):
         js = f'window.open("{url}");'
@@ -272,5 +278,3 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     driver.maximize_window()
     driver.find_element_by_name("Submit")
-```
-
