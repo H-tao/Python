@@ -1,4 +1,4 @@
-
+```python
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver.common.by import By
 import selenium.webdriver.support.expected_conditions as EC
@@ -278,3 +278,4 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     driver.maximize_window()
     driver.find_element_by_name("Submit")
+```
