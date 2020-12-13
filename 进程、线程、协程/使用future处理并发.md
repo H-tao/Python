@@ -15,7 +15,7 @@ urls = ['https://www.python.org/ftp/python/3.7.5/Python-3.7.5.tgz',
 with futures.ThreadPoolExecutor(max_workers=3) as executor:
     to_do = []
     for url in urls:
-        future = executor(download_source, url)
+        future = executor.submit(download_source, url)
         to_do.append(future)
 
     results = []
