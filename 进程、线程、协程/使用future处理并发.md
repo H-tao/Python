@@ -21,6 +21,7 @@ with futures.ThreadPoolExecutor(max_workers=3) as executor:
     results = []
     for future in futures.as_completed(to_do):
         res = future.result()
+        future.done()
         results.append(res)
 ```
 
@@ -44,7 +45,7 @@ Executor.map()定义在Lib.concurrent.futures._base中：
 ```python
 def map(self, fn, *iterables, timeout=None, chunksize=1):
     ...
-    fs = [self.submit(fn, *args) for args in zip(*iterables)]	# 将可迭代对象使用submit()构造成futures
+    fs = [self.submit(fn, *args) for args in zip(*iterables)]	# 将可迭代对象使用submit()构造生成futures
     def result_iterator():
         ...
         while fs:
@@ -56,5 +57,5 @@ def map(self, fn, *iterables, timeout=None, chunksize=1):
     return result_iterator()
 ```
 
-可以看到，Executor.map()返回一个迭代器，迭代器中包含的是各个future的结果，而非future本身。map()接收的参数就不再一一说明了。
+可以看到，Executor.map()内部也是使用了submit()和result()，但是它返回一个迭代器，迭代器中包含的是各个future的结果，而非future本身。map()接收的参数就不再一一说明了。
 
