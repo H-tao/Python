@@ -20,7 +20,7 @@ print(sa)
 ```css
 {'name': 'Spade_', 'score': 66, 'number': '20201001', 'school': 'Number One School'}
 ```
-其实任何地方都可以为实例对象增加属性，比如这样，sa就多了一个xiaoming属性：
+其实任何地方都可以为实例对象增加属性，比如这样，sa就多了一个address属性：
 ```python
 sa.address = 'beijing'
 print(sa)
