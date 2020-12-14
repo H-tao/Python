@@ -25,7 +25,7 @@ print(sa)
 sa.address = 'beijing'
 print(sa)
 ```
-``css
+```css
 {'name': 'Spade_', 'score': 66, 'number': '20201001', 'school': 'Number One School', 'address': 'beijing'}
 ```
-但是并不推荐这种做法，因为在这样增加的属性是不受控制的。换句话来说，你在这个地方为实例对象增加了属性，我在其他地方并不知道有这属性。
+> 但是并不推荐这种做法，因为在这样增加的属性是不受控制的。换句话来说，你在这个地方为实例对象增加了属性，我在其他地方并不知道有这属性。
