@@ -1,34 +1,23 @@
+## 写作背景
+
 主旨：
 
 1. 介绍yield关键字的用法、生成器和生成器函数
 2. 什么是协程、生成器函数和协程的区别
-3. 从yield到yield from，引出异步编程
-4. future库的用法
-5. 
+3. 从yield到yield from
+4. future处理并发
+5. asyncio处理并发
+6. 异步爬虫实战
 
+很多面试官，上来就是喂你一道协程。很多文章，上来就是教你用asyncio。太难了呀。所以我想写一写自己学到的东西，把有关协程和异步编程的一整个系列写下来。可能会有不对的地方，希望各位看官多多指教。
 
+## 从生成器函数到协程
 
+协程是异步编程的基础，为了理解异步编程，我们就得先搞明白什么是协程。而协程和生成器函数息息相关，因为协程也是一种生成器函数。所以我们再看看生成器函数。
 
+### 1. yield、生成器和生成器函数
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## yield、生成器和生成器函数
-
-下面讲一个例子，demo1()里面使用了yield，是一个生成器函数，返回一个生成器。我们可以使用next()方法来迭代生成器，每次迭代next()获取到的就是**yield产生的值，也就是yield右边的值**。
+回顾一个例子，demo1()里面使用了yield，是一个生成器函数，返回一个生成器。我们可以使用next()方法来迭代生成器，每次迭代next()获取到的就是**yield产生的值，也就是yield右边的值**。
 
 ```python
 # yield可以理解为暂停按钮，每次执行到yield，保存断点，同时yield还会返回值给调用方
@@ -62,11 +51,9 @@ StopIteration
 
 总共三次yield，我们是调用方，使用next(g)收到了三个yield返回值，当我们尝试调用第四次时，demo1函数产生了一个`StopIteration`告诉我们找不到yield了，raise StopIteration。
 
-## next()和send()的因缘
+### 2. next()和send(None)
 
-先讲讲next()和send()的因缘。
-
-### next() == send(None)
+为了将协程，我们先讲讲next()和send()的因缘，next() == send(None)。但是send()是为了传值给生成器而是用的，这个后面会解决
 
 ```powershell
 >>> def demo2(value=None):
@@ -87,7 +74,9 @@ start
 >>>
 ```
 
-为什么说next() == send(None)？我们看看底层代码！
+为什么说next() == send(None)？我们看看底层代码！不感兴趣的可以跳过。
+
+### 3. send()和next()的C语言实现
 
 Python底层是由C语言实现的，让我们摘出next()和send()来观察看看！ 
 
@@ -106,7 +95,7 @@ gen_send(PyGenObject *gen, PyObject *arg)
 }
 ```
 
-### send() 给生成器函数传值
+### 4. send() 给生成器函数传值
 
 我们在上面讲到了yield通过`yield item`可以返回值给调用方，调用方可以通过next()获取到yield的产出值。其实yield还可以接受调用方传来的值，通过`data = yield`，生成器函数内就可以接收调用方传来的值。`data = yield item` 可以产出一个值item给调用方，同时接收调用方（调用方使用send）传来的值，然后暂停执行，作出让步，使调用方继续工作，直到调用方下次继续执行send。
 
@@ -151,7 +140,7 @@ Traceback (most recent call last):
 StopIteration
 ```
 
-## 使用Pycharm的DEBUG模式理解data = yield item的执行过程
+### 5. 使用Pycharm的DEBUG模式理解data = yield item的执行过程
 
 还是上面的那段代码，在14行打上断点：
 
@@ -163,7 +152,7 @@ def demo2(value=None):
     b = yield value
     print("demo1 Received: ", b)
     c = yield 2
-    print("demo1 Received: ", c)
+    print("demo1  Received: ", c)
     print('end')
 
 g = demo2("Value")
@@ -180,20 +169,39 @@ print(g.send(300))
 
 ## 协程
 
-什么是协程？这是第一个问题。很多博客和书都在讲协程，但是并没有给出协程定义。也有人把协程叫做“微线程”，下面给出书上的原话：
+### 1. 什么是协程？
+
+什么是协程？这是第一个问题。很多博客和书都在讲协程，但是并没有给出协程定义。也有人把协程叫做“微线程”，下面给出书上的一句话：
 
 > 协程是指一个过程，这个过程与调用方协作，产出由调用方提供的值。 ——《流程的Python》
 
-区别生成器函数和协程：
+Python的`协程`，其实就是包含`data = yield`的生成器函数，当然也可以是包含`data = yield item`。
+
+我们上面讲的例子，demo2()就是一个协程：
+
+```javascript
+def demo2(value=None):
+    print('start')
+    a = yield 1
+    print("demo1 Received: ", a)
+    b = yield value
+    print("demo1 Received: ", b)
+    c = yield 2
+    print("demo1  Received: ", c)
+    print('end')
+```
+
+### 2. 个人对yield和协程的理解
+
+普通的函数，都是等待接收方调用，调用一次执行（接收参数、执行函数体、返回值）就结束了。如果有一个函数，在一次调用内，既能够接收你传入的值n次，又能返回值m次给你，在执行过程中，可以暂停等待你传值，直到你需要再次启动，是不是感觉有点牛逼？没错，我们前面看到的，Python里`yield关键字`不就是做这件事的吗？`data = yield item` 可以产出一个值item给调用方，同时接收调用方（调用方使用send）传来的值，然后暂停执行，作出让步，使调用方继续工作，直到调用方下次继续执行send。
+
+总之，`data = yield item` 执行过程可以理解为产出值、暂停、接收值上一次send传来的值，依次反复。
+
+### 3. 区别生成器函数和协程
 
 1. 包含`yield`关键字的函数就是`生成器函数`。
-2. 通过`data = yield`，生成器函数内就可以接收调用方传来的值，接收值的生成器函数，就可以理解为Python的`协程`。
+2. 通过`data = yield`生成器函数内就可以接收调用方传来的值，接收值的生成器函数，就可以理解为Python的`协程`。
 
+## 期待再会...
 
-
-## 个人对yield关键字、协程的理解
-
-普通的函数，都是等待接收方调用，调用一次执行（接收参数、执行函数体、返回值）就结束了。如果有一个函数，在一次调用内，既能够接收你传入的值n次，又能返回值m次给你，在执行过程中，可以暂停等待你传值，直到你需要再次启动，是不是感觉有点牛逼？没错，Python里yield关键字就可以做到这件事。`data = yield item` 可以产出一个值item给调用方，同时接收调用方（调用方使用send）传来的值，然后暂停执行，作出让步，使调用方继续工作，直到调用方下次继续执行send。
-
-总之，我个人理解，`data = yield item` 执行过程可以理解为产出值、暂停、接收值上一次send传来的值，依次反复。
-
+协程还没讲完，后续内容会慢慢更新。
