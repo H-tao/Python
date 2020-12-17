@@ -1,5 +1,4 @@
 ```python
-
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotInteractableException
 from selenium.webdriver.common.by import By
 import selenium.webdriver.support.expected_conditions as EC
@@ -9,6 +8,7 @@ from selenium import webdriver
 from Config.settings import EXECUTABLE_PATH
 import time
 
+EXECUTABLE_PATH = r'C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe'
 
 class Driver:
     def __init__(self, show_windows=True):
@@ -30,6 +30,19 @@ class Driver:
             print("Open url %s success!" % url)
         except Exception as e:
             print(e)
+
+    def refresh(self):
+        self.browser.refresh()   # 刷新
+        time.sleep(2)
+
+    def quit(self):
+        self.browser.quit()
+
+    def get_current_url(self):
+        return self.browser.current_url
+
+    def get_cookie(self):
+        return '; '.join(['='.join([c['name'], c['value']]) for c in self.browser.get_cookies()])
 
     # 一直等待某个元素出现，默认超时10秒
     def is_visible(self, locator, timeout=10):
@@ -72,7 +85,7 @@ class Driver:
         else:
             return False
 
-    def click_element_until(self, xpath, timeout=2):
+    def click_element_until(self, xpath, timeout=10):
         if not self.is_visible(xpath, timeout):  # 等待元素出现
             return False
         else:
@@ -110,6 +123,21 @@ class Driver:
             time.sleep(0.05)
             element.send_keys(keys)
             return True
+        except NoSuchElementException as e:
+            print(e)
+            return False
+
+    def clear_key(self, xpath):
+        self.is_visible(xpath)
+        try:
+            element = self.browser.find_element_by_xpath(xpath)
+            time.sleep(0.05)
+            try:
+                element.clear()
+            except ElementNotInteractableException:
+                return False
+            else:
+                return True
         except NoSuchElementException as e:
             print(e)
             return False
@@ -155,9 +183,6 @@ class Driver:
             driver_.close()  # 关闭当前窗口
         driver_.switch_to.window(driver_.window_handles[-1])  # 切换主窗口
 
-    def quit(self):
-        self.browser.quit()
-
     def find_element_by_xpath(self, xpath):
         try:
             element = self.browser.find_element_by_xpath(xpath)
@@ -167,7 +192,8 @@ class Driver:
         else:
             return element
 
-    def find_sub_element_by_xpath(self, element, xpath):
+    @staticmethod
+    def find_sub_element_by_xpath(element, xpath):
         try:
             sub_element = element.find_element_by_xpath(xpath)
         except NoSuchElementException as e:
@@ -177,7 +203,12 @@ class Driver:
             return sub_element
 
     # def status_code(self):
-    #     self.browser.get()
+    #     self.browser.__get()
+
+    def set_element_value(self, xpath, value):
+        """ Xpath中使用双引号，则拼接js时要使用单引号包裹双引号 """
+        js = f'var ele = document.evaluate(\'{xpath}\', document).iterateNext(); ele.value = arguments[0];'
+        self.browser.execute_script(js, value)
         
     def open_url_in_new_window(self, url, close_current=False):
         js = f'window.open("{url}");'
@@ -247,5 +278,4 @@ if __name__ == '__main__':
     driver = webdriver.Chrome()
     driver.maximize_window()
     driver.find_element_by_name("Submit")
-
 ```
