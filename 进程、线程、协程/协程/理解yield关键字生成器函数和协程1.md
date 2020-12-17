@@ -1,6 +1,34 @@
+主旨：
+
+1. 介绍yield关键字的用法、生成器和生成器函数
+2. 什么是协程、生成器函数和协程的区别
+3. 从yield到yield from，引出异步编程
+4. future库的用法
+5. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## yield、生成器和生成器函数
 
-下面讲一个例子，demo1()里面使用了yield，是一个生成器函数，返回一个生成器。我们可以使用next()方法来迭代生成器，每次迭代获取到的就是**yield产生的值，也就是yield右边的值**。
+下面讲一个例子，demo1()里面使用了yield，是一个生成器函数，返回一个生成器。我们可以使用next()方法来迭代生成器，每次迭代next()获取到的就是**yield产生的值，也就是yield右边的值**。
 
 ```python
 # yield可以理解为暂停按钮，每次执行到yield，保存断点，同时yield还会返回值给调用方
@@ -38,7 +66,7 @@ StopIteration
 
 先讲讲next()和send()的因缘。
 
-next() == send(None)
+### next() == send(None)
 
 ```powershell
 >>> def demo2(value=None):
@@ -78,15 +106,15 @@ gen_send(PyGenObject *gen, PyObject *arg)
 }
 ```
 
-
+### send() 给生成器函数传值
 
 我们在上面讲到了yield通过`yield item`可以返回值给调用方，调用方可以通过next()获取到yield的产出值。其实yield还可以接受调用方传来的值，通过`data = yield`，生成器函数内就可以接收调用方传来的值。`data = yield item` 可以产出一个值item给调用方，同时接收调用方（调用方使用send）传来的值，然后暂停执行，作出让步，使调用方继续工作，直到调用方下次继续执行send。
 
-1. `yield item`：产出值
-2. `data = yield`：接收值
-3. `data = yield item`：产出值和接收值
+1. `yield item`：产出值item给调用方。
+2. `data = yield`：data接收值，下一次send()时，data才会接收到上一次send()的值。
+3. `data = yield item`：产出值和接收值，先yield item产出值，下一次send()时，data才会接收到上一次send()的值。所以分为yield item 和 data = yield 两步走。
 
-我们看一个产出值和接收值的例子：
+为了理解产出值和接收值，我们看一个产出值和接收值的例子：
 
 ```python
 def demo2(value=None):
@@ -156,10 +184,12 @@ print(g.send(300))
 
 > 协程是指一个过程，这个过程与调用方协作，产出由调用方提供的值。 ——《流程的Python》
 
-生成器函数和协程：
+区别生成器函数和协程：
 
 1. 包含`yield`关键字的函数就是`生成器函数`。
 2. 通过`data = yield`，生成器函数内就可以接收调用方传来的值，接收值的生成器函数，就可以理解为Python的`协程`。
+
+
 
 ## 个人对yield关键字、协程的理解
 
