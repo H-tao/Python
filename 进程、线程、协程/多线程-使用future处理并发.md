@@ -41,7 +41,7 @@ print(list(res))
 [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900]
 ```
 
-**注意事项：**map() 返回结果的顺序和调用开始的顺序一直，如果第一个调用生成结果用时10秒，而其他调用只用1秒，代码会阻塞10秒以获取第一个结果。在此之后，获取后续结果不会阻塞，因为后续调用已经结束。更可取的方式是，不管提交顺序如何，只要有结果就获取。而使用 Executor.submit 方法和 futures.as_completed 函数可以帮我们完成这种方式。
+**注意事项：** map() 返回结果的顺序和调用开始的顺序一直，如果第一个调用生成结果用时10秒，而其他调用只用1秒，代码会阻塞10秒以获取第一个结果。在此之后，获取后续结果不会阻塞，因为后续调用已经结束。更可取的方式是，不管提交顺序如何，只要有结果就获取。而使用 Executor.submit 方法和 futures.as_completed 函数可以帮我们完成这种方式。
 
 ### 2. 使用 submit() 提交单个任务
 
@@ -65,7 +65,7 @@ with futures.ThreadPoolExecutor(max_workers=5) as executor:
 
 此处 submit() 返回的 future 并不是结果，而是指待完成的操作。future 封装待完成的操作，可以放入队列，完成的状态可以查询，得到结果后可以获取结果（或者异常）。
 
-###3. 使用 as_completed() 逐个获取已完成的任务
+### 3. 使用 as_completed() 逐个获取已完成的任务
 
 >  as_completed() 返回一个包含 *fs* 所指定的 [`Future`](https://docs.python.org/zh-cn/3/library/concurrent.futures.html#concurrent.futures.Future) 实例（可能由不同的 [`Executor`](https://docs.python.org/zh-cn/3/library/concurrent.futures.html#concurrent.futures.Executor) 实例创建）的迭代器，这些实例会在完成时生成 future 对象（包括正常结束或被取消的 future 对象）。 任何由 *fs* 所指定的重复 future 对象将只被返回一次。 任何在 [`as_completed()`](https://docs.python.org/zh-cn/3/library/concurrent.futures.html#concurrent.futures.as_completed) 被调用之前完成的 future 对象将优先被生成。 如果 [`__next__()`](https://docs.python.org/zh-cn/3/library/stdtypes.html#iterator.__next__) 被调用并且在对 [`as_completed()`](https://docs.python.org/zh-cn/3/library/concurrent.futures.html#concurrent.futures.as_completed) 的原始调用 *timeout* 秒之后结果仍不可用，则返回的迭代器将引发 [`concurrent.futures.TimeoutError`](https://docs.python.org/zh-cn/3/library/concurrent.futures.html#concurrent.futures.TimeoutError)。 *timeout* 可以为整数或浮点数。 如果 *timeout* 未指定或为 `None`，则不限制等待时间。 
 
