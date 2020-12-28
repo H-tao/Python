@@ -258,6 +258,13 @@ class Driver:
         else:
             ActionChains(self.browser).move_by_offset(x, y).context_click().perform()
         ActionChains(self.browser).move_by_offset(-x, -y).perform()  # 将鼠标位置恢复到移动前
+        
+    def right_click_element(self, xpath):
+        element = self.find_element_by_xpath(xpath)
+        if element is None:
+            return False
+        ActionChains(self.browser).context_click(on_element=element).perform()
+        return True
 
     def move_element_by_offset(self, xpath, x, y):
         """ 将一个元素按偏移移动 """
