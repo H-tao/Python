@@ -126,3 +126,71 @@ b'<h1>Hello World : 2020-12-21 11:14:11.097478<h1>'
 ```
 
 5次的请求处理的间隔几乎相同。
+
+### 使用as_completed
+
+```python
+import asyncio
+import time
+import aiohttp
+from functools import wraps
+
+
+def time_elapsed(func):
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        start_time = time.time()
+        res = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed = end_time - start_time
+        print(f'{res} used time in {elapsed}')
+        return res
+    return decorator
+
+
+async def download_one(session, url, semaphore):
+    async with semaphore:
+        async with session.get(url) as resp:  # <4>
+            return await resp.read()  # <5>
+
+
+async def download_many(urls, coroutine_num):
+    results = []
+    semaphore = asyncio.Semaphore(coroutine_num)
+    async with aiohttp.ClientSession() as session:
+        to_do = [download_one(session, url, semaphore)
+                 for url in urls]
+
+        to_do_iter = asyncio.as_completed(to_do)
+        for future in to_do_iter:
+            res = await future
+            print(f'many {res}')
+            results.append(res)
+
+    return results
+
+
+@time_elapsed
+def main():  # <10>
+    coroutine_num = 5
+    urls = ['http://127.0.0.1:8080/'] * 20
+    results = asyncio.run(download_many(urls, coroutine_num))
+    return len(results)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+将download_one拆开：
+
+```python
+async def get_url(session, url):
+    async with session.get(url) as resp:  # <4>
+        return await resp.read()  # <5>
+
+async def download_one(session, url, semaphore):
+    async with semaphore:
+        return await get_url(session, url)
+```
+
