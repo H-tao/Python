@@ -157,3 +157,18 @@ if v is not pandas.np.nan:
     print(True)
 ```
 
+##### 合并两个表
+
+```python
+import pandas as pd
+
+EXCEL_PATH = 'x1.xlsx'
+
+ex1_ = pd.read_excel(EXCEL_PATH, sheet_name='Sheet2')
+ex2_ = pd.read_excel(EXCEL_PATH, sheet_name='Sheet3')
+
+one_merge = pd.merge(left=ex1_, right=ex2_, how="outer", on=['name', 'name'])
+one_merge.drop_duplicates(['name'], inplace=True)
+print(one_merge)
+one_merge.to_excel('输出.xlsx', index=False)
+```
