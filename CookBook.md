@@ -1,6 +1,6 @@
 ```python
 """
-lambda 表达式的坑
+lambda 表达式的坑:参考CookBook 7.7 在匿名函数中绑定变量的值
 lambda 表达式中用到的 x 是一个自由变量，在运行时才进行绑定而不是定义的时候绑定。
 """
 funcs = [lambda x: x+n for n in range(5)]
