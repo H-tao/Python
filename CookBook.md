@@ -1,3 +1,4 @@
+```python
 """
 lambda 表达式的坑
 lambda 表达式中用到的 x 是一个自由变量，在运行时才进行绑定而不是定义的时候绑定。
@@ -9,7 +10,9 @@ for f in funcs:
 funcs = [lambda x, n=n: x+n for n in range(5)]
 for f in funcs:
     print(f(0))
+```
 
+```python
 """
 为什么要使用闭包？
 当编写代码中遇到需要附加额外的状态给函数时，可以使用闭包。
@@ -31,7 +34,9 @@ def func1(tmp):
 
 my_func = func1(1)
 print(my_func(2))
+```
 
+```python
 """
 闭包和format_map
 """
@@ -44,3 +49,4 @@ def outer_func(x):
 
 func = outer_func('n={name}&&s={score}')
 print(func(name="XiaoHong", score="WWWW"))
+```
