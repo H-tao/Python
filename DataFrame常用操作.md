@@ -153,7 +153,16 @@ idx_null = df['列名'].isnull().sum(axis=0)
 ##### 判断NaN
 
 ```python
-if v is not pandas.np.nan:
+import pandas
+if pandas.np.isnan(x):
+    print(True)
+
+import numpy
+if numpy.isnan(x):
+    print(True)
+    
+import math
+if math.isnan(x):
     print(True)
 ```
 
