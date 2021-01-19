@@ -164,6 +164,8 @@ if numpy.isnan(x):
 import math
 if math.isnan(x):
     print(True)
+    
+if v is not pandas.np.nan: ?
 ```
 
 ##### 合并两个表
