@@ -280,6 +280,11 @@ class Driver:
         ac = ActionChains(self.browser).click_and_hold(ele).move_to_element_with_offset(to_ele, x, y).release()
         ac.perform()
 
+    def scroll_down(self, class_name, gap):
+        """ 元素下拉，gap代表距离 """
+        js = f'document.getElementsByClassName("{class_name}")[0].scrollTop={gap};'
+        self.browser.execute_script(js)
+
 
 if __name__ == '__main__':
     driver = webdriver.Chrome()
