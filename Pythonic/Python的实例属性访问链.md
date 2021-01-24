@@ -86,7 +86,7 @@ class Student:
             return super().__getattribute__(item)
         except AttributeError:      # 捕获AttributeError
             print('AttributeError')
-            getattr(Student, item)      # 手动调用 getattr
+            return getattr(Student, item)      # 手动调用 getattr
             # return self.__getattr__(item)       # 这种相当于获取实例的 __getattr__ 再调用 __getattr___(item)
             # getattr(self, item)      # 错误的方式。这种方式相当于调用实例.属性(self.item)，而我们要获取的就是self.name，所以会导致无限递归
 
