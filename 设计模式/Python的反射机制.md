@@ -32,7 +32,7 @@ class Person(object):
 p = Person("John")
 
 n = getattr(p, "name")  # 获取name变量的内存地址
-print(n)  # 此时打印的是:laowang
+print(n)  # 此时打印的是:John
 
 f = getattr(p, "talk")  # 获取talk方法的内存地址
 f()  # 调用talk方法
@@ -49,7 +49,7 @@ Not Found!
 
 ### setattr
 
-为对象添加变量或方法。
+为对象添加变量或方法。setattr方法会将属性放在实例字典`__dict__` 中。
 
 ```python
 def talk_func(self):
@@ -59,12 +59,16 @@ class Person(object):
     def __init__(self, name):
         self.name = name
 
-p = Person("John")
+p = Person("John")   # 查看实例字典
+print(p.__dict__)
+
 setattr(p, "talk", talk_func)  # 将abc函数添加到对象中p中，并命名为talk
 p.talk(p)  # 调用talk方法，因为这是额外添加的方法，需手动传入对象
 
 setattr(p, "age", 30)  # 添加一个变量age,赋值为30
 print(p.age)  # 打印结果:30
+
+print(p.__dict__)   # 查看实例字典
 ```
 
 ### delattr
