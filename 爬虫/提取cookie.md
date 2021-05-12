@@ -5,12 +5,19 @@
 ```python
 response = requests.post(self.post_url, data=data, headers=self.headers)
 
-cookies = response.cookies
 cookies = requests.utils.dict_from_cookiejar(response.cookies)
 self.headers['Cookie'] = '; '.join(['='.join([k, v]) for k, v in cookies.items()])
 
 response = requests.get(self.visit_url, headers=self.headers, verify=False)
 print(response.text)
+```
+```python
+# dict_from_cookiejar 替换代码
+cookie_dict = {}
+for cookie in response.cookies:
+    cookie_dict[cookie.name] = cookie.value
+
+headers['Cookie'] = '; '.join(['='.join([k, v]) for k, v in cookie_dict.items()])
 ```
 
 ### 2. session 登录后的Cookie，通过`session.cookies`获取：
